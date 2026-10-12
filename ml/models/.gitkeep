@@ -1,0 +1,3 @@
+# Placeholder directories — git ignores empty dirs but these files preserve them.
+# ml/models/   — saved model files (.pkl, .pt, .onnx)
+# ml/artifacts/ — training artifacts (plots, metrics JSON, etc.)

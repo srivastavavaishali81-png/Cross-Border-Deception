@@ -1,0 +1,46 @@
+name: ozark-db-only
+
+# Minimal compose for local development — databases only.
+# Use this when running frontend/backend natively without Docker.
+#
+# Usage:
+#   docker compose -f docker/docker-compose.db.yml up -d
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ozark_postgres_dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ozark}
+      POSTGRES_USER: ${POSTGRES_USER:-ozark_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ozark_user}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  neo4j:
+    image: neo4j:5-community
+    container_name: ozark_neo4j_dev
+    restart: unless-stopped
+    environment:
+      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-password}
+    ports:
+      - "${NEO4J_HTTP_PORT:-7474}:7474"
+      - "${NEO4J_BOLT_PORT:-7687}:7687"
+    volumes:
+      - neo4j_dev_data:/data
+
+volumes:
+  postgres_dev_data:
+  neo4j_dev_data:
+
+networks:
+  default:
+    name: ozark_dev_network
